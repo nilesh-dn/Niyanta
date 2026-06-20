@@ -11,6 +11,7 @@ class PluginController
     public function index(): void
     {
         View::render('settings.plugins', [
+            'title'   => 'Plugins',
             'plugins' => PluginManager::available(),
         ], 'app');
     }

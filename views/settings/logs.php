@@ -1,5 +1,11 @@
 <?php /** @var array $logs */ ?>
-<h1 class="h3 mb-4">System Logs</h1>
+<div class="page-header">
+    <div>
+        <h1>System Logs</h1>
+        <p class="page-sub">Recent activity across the workspace.</p>
+    </div>
+</div>
+<?= \Niyanta\Core\View::partial('partials.settings-nav') ?>
 
 <div class="card">
     <div class="card-body">

@@ -1,5 +1,11 @@
 <?php /** @var string $company @var bool $managerViewSalary */ ?>
-<h1 class="h3 mb-4">Settings</h1>
+<div class="page-header">
+    <div>
+        <h1>Settings</h1>
+        <p class="page-sub">Manage your workspace configuration.</p>
+    </div>
+</div>
+<?= \Niyanta\Core\View::partial('partials.settings-nav') ?>
 
 <div class="card">
     <div class="card-body">

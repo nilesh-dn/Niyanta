@@ -3,7 +3,12 @@
 use Niyanta\Core\Theme;
 $theme = Theme::current();
 ?>
-<h1 class="h3 mb-4">My Profile</h1>
+<div class="page-header">
+    <div>
+        <h1>My Profile</h1>
+        <p class="page-sub">Manage your account and appearance.</p>
+    </div>
+</div>
 
 <div class="row g-4">
     <div class="col-12 col-lg-6">

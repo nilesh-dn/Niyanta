@@ -11,6 +11,7 @@ class BrandingController
     public function index(): void
     {
         View::render('settings.branding', [
+            'title'    => 'Branding',
             'company'  => Branding::companyName(),
             'logo'     => Branding::logoUrl(),
             'palettes' => Branding::palettes(),

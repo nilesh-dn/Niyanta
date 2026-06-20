@@ -1,7 +1,13 @@
 <?php
 /** @var string $company @var ?string $logo @var array $palettes @var array $active */
 ?>
-<h1 class="h3 mb-4">Branding</h1>
+<div class="page-header">
+    <div>
+        <h1>Branding</h1>
+        <p class="page-sub">Company identity, logo and colour palettes.</p>
+    </div>
+</div>
+<?= \Niyanta\Core\View::partial('partials.settings-nav') ?>
 
 <div class="row g-4">
     <div class="col-12 col-lg-5">

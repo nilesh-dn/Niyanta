@@ -1,5 +1,11 @@
 <?php /** @var array $plugins */ ?>
-<h1 class="h3 mb-4">Plugins</h1>
+<div class="page-header">
+    <div>
+        <h1>Plugins</h1>
+        <p class="page-sub">Upload, install and manage feature modules.</p>
+    </div>
+</div>
+<?= \Niyanta\Core\View::partial('partials.settings-nav') ?>
 
 <div class="card mb-4">
     <div class="card-body">

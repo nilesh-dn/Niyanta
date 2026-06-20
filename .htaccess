@@ -1,0 +1,25 @@
+# Niyanta front-controller routing for shared hosting (Apache)
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # If you install in a subdirectory, set the base accordingly, e.g.:
+    # RewriteBase /niyanta/
+
+    # Serve existing files and directories directly
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Route everything else through the front controller
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Deny direct access to sensitive paths
+RedirectMatch 403 ^/?config\.php$
+RedirectMatch 403 ^/?core/
+RedirectMatch 403 ^/?storage/
+RedirectMatch 403 ^/?install/schema\.sql$
+
+# Disable directory listings
+Options -Indexes

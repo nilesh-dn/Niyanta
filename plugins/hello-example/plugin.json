@@ -1,0 +1,6 @@
+{
+    "name": "Hello Example",
+    "version": "1.0",
+    "author": "Niyanta Team",
+    "description": "Minimal example plugin demonstrating routes, menus, permissions and dashboard widgets."
+}

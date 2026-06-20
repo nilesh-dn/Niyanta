@@ -1,0 +1,25 @@
+# Generated configuration (contains DB credentials)
+/config.php
+
+# Runtime storage
+/storage/logs/*
+/storage/cache/*
+/storage/sessions/*
+!/storage/logs/.gitkeep
+!/storage/cache/.gitkeep
+!/storage/sessions/.gitkeep
+
+# User uploads
+/uploads/logos/*
+/uploads/plugins/*
+/uploads/files/*
+!/uploads/logos/.gitkeep
+!/uploads/plugins/.gitkeep
+!/uploads/files/.gitkeep
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

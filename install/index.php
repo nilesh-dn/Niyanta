@@ -1,0 +1,140 @@
+<?php
+/**
+ * Niyanta installation wizard.
+ *
+ * Reached from the front controller only when config.php does not exist.
+ * Self-locks once installation is complete.
+ */
+
+use Niyanta\Core\Config;
+use Niyanta\Core\Database;
+use Niyanta\Core\View;
+
+// Hard guard: never run if already installed.
+if (Config::isInstalled()) {
+    redirect('/login');
+}
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+$errors = [];
+$step = (int) ($_GET['step'] ?? 0);
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+/** Render an installer screen wrapped in the install layout. */
+$show = static function (string $screen, array $data, int $indicator) use (&$errors): void {
+    $data['errors'] = $errors;
+    $data['step'] = $indicator;
+    View::render('install.' . $screen, $data, 'install');
+    exit;
+};
+
+// ---- Requirements / welcome ----
+$checks = [
+    'PHP 8.0 or newer'              => PHP_VERSION_ID >= 80000,
+    'PDO MySQL extension'           => extension_loaded('pdo_mysql'),
+    'Zip extension (plugin upload)' => extension_loaded('zip'),
+    'Project directory is writable' => is_writable(base_path()),
+    'storage/ is writable'          => is_writable(base_path('storage')),
+    'uploads/ is writable'          => is_writable(base_path('uploads')),
+];
+// Zip is recommended, not mandatory, for completing installation.
+$mandatory = $checks;
+unset($mandatory['Zip extension (plugin upload)']);
+$ok = !in_array(false, $mandatory, true);
+
+if ($method === 'GET' || $step === 0) {
+    $show('requirements', ['checks' => $checks, 'ok' => $ok], 1);
+}
+
+// ---- Step 1 -> show database form ----
+if ($method === 'POST' && $step === 1) {
+    $show('db', ['data' => $_SESSION['install'] ?? []], 2);
+}
+
+// ---- Step 2: test DB connection + create tables ----
+if ($method === 'POST' && $step === 2) {
+    $data = [
+        'db_host' => trim((string) request('db_host', 'localhost')),
+        'db_name' => trim((string) request('db_name', '')),
+        'db_user' => trim((string) request('db_user', '')),
+        'db_pass' => (string) request('db_pass', ''),
+    ];
+    $_SESSION['install'] = array_merge($_SESSION['install'] ?? [], $data);
+
+    try {
+        $pdo = Database::connect($data['db_host'], $data['db_name'], $data['db_user'], $data['db_pass']);
+        Database::runScript($pdo, (string) file_get_contents(__DIR__ . '/schema.sql'));
+        $show('admin', ['data' => $_SESSION['install']], 3);
+    } catch (Throwable $e) {
+        $errors[] = 'Database error: ' . $e->getMessage();
+        $show('db', ['data' => $data], 2);
+    }
+}
+
+// ---- Step 3: create admin, company settings, write config.php ----
+if ($method === 'POST' && $step === 3) {
+    $db = $_SESSION['install'] ?? [];
+    $company  = trim((string) request('company_name', 'ABC Pvt Ltd.'));
+    $adminName = trim((string) request('admin_name', ''));
+    $adminEmail = trim((string) request('admin_email', ''));
+    $adminPass = (string) request('admin_password', '');
+
+    if ($adminName === '' || !filter_var($adminEmail, FILTER_VALIDATE_EMAIL) || strlen($adminPass) < 8) {
+        $errors[] = 'Please provide a valid name, email and a password of at least 8 characters.';
+        $show('admin', ['data' => array_merge($db, compact('company') + ['admin_name' => $adminName, 'admin_email' => $adminEmail])], 3);
+    }
+
+    try {
+        $pdo = Database::connect($db['db_host'], $db['db_name'], $db['db_user'], $db['db_pass']);
+
+        // Seed Super Admin (role_id 1).
+        $stmt = $pdo->prepare(
+            'INSERT INTO users (name, email, password_hash, role_id, status) VALUES (?, ?, ?, 1, "active")'
+        );
+        $stmt->execute([$adminName, $adminEmail, password_hash($adminPass, PASSWORD_DEFAULT)]);
+
+        // Company branding setting.
+        $set = $pdo->prepare('INSERT INTO settings (`key`, `value`) VALUES (?, ?)
+                              ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)');
+        $set->execute(['company_name', $company]);
+
+        // Write config.php.
+        $appKey = bin2hex(random_bytes(24));
+        writeConfig($db, $appKey);
+
+        unset($_SESSION['install']);
+        $show('done', [], 4);
+    } catch (Throwable $e) {
+        $errors[] = 'Installation failed: ' . $e->getMessage();
+        $show('admin', ['data' => $db], 3);
+    }
+}
+
+// Fallback.
+redirect('/');
+
+/** Generate config.php from the collected database credentials. */
+function writeConfig(array $db, string $appKey): void
+{
+    $config = [
+        'db' => [
+            'host'    => $db['db_host'] ?? 'localhost',
+            'name'    => $db['db_name'] ?? '',
+            'user'    => $db['db_user'] ?? '',
+            'pass'    => $db['db_pass'] ?? '',
+            'charset' => 'utf8mb4',
+        ],
+        'app_key'   => $appKey,
+        'base_path' => '',
+        'debug'     => false,
+    ];
+    $export = var_export($config, true);
+    $contents = "<?php\n/**\n * Niyanta configuration — generated by the installer.\n * Delete this file to re-run the installation wizard.\n */\n\nreturn " . $export . ";\n";
+
+    if (file_put_contents(base_path('config.php'), $contents) === false) {
+        throw new RuntimeException('Could not write config.php. Check directory permissions.');
+    }
+}

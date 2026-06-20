@@ -5,10 +5,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Install Niyanta</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="<?= asset('assets/vendor/bootstrap/bootstrap.min.css') ?>" rel="stylesheet">
+    <link href="<?= asset('assets/vendor/bootstrap-icons/bootstrap-icons.min.css') ?>" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'Inter'; font-style: normal; font-weight: 100 900; font-display: swap;
+            src: url('<?= asset('assets/vendor/inter/inter.woff2') ?>') format('woff2');
+        }
         body { font-family: 'Inter', system-ui, sans-serif; background: #0B1F4D; min-height: 100vh; }
         .install-wrap { max-width: 620px; margin: 0 auto; padding: 2.5rem 1rem; }
         .install-card { border: none; border-radius: 14px; }

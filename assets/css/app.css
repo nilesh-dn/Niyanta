@@ -3,8 +3,19 @@
    Design tokens derive from the active palette (--color-primary/secondary/accent)
    which is injected per-request by Branding::cssVariables(). Both light and dark
    modes are tinted by the palette via color-mix(), so switching palettes
-   re-themes the whole app.
+   re-themes the whole app. Each tokenised colour declares a static fallback
+   first, then a color-mix() value, so browsers without color-mix still render.
+   Bootstrap, Bootstrap Icons and Inter are self-hosted under /assets/vendor.
    =========================================================================== */
+
+/* Self-hosted Inter (variable). Mirrors the former Google Fonts dependency. */
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('../vendor/inter/inter.woff2') format('woff2');
+}
 
 :root {
     --color-primary: #0B1F4D;
@@ -25,24 +36,32 @@
     --space-6: 2rem;
 }
 
-/* ---- Semantic tokens: LIGHT ---- */
+/* ---- Semantic tokens: LIGHT (static fallback, then palette color-mix) ---- */
 :root,
 [data-bs-theme="light"] {
     --brand: var(--color-primary);
+    --brand-hover: #091a40;
     --brand-hover: color-mix(in srgb, var(--color-primary) 86%, #000);
+    --brand-soft: rgba(11, 31, 77, .10);
     --brand-soft: color-mix(in srgb, var(--color-primary) 10%, transparent);
     --on-brand: #fff;
     --accent: var(--color-accent);
 
+    --app-bg: #f2f5fb;
     --app-bg: color-mix(in srgb, var(--color-secondary) 9%, #f2f5fb);
     --surface: #ffffff;
+    --surface-2: #f5f8fc;
     --surface-2: color-mix(in srgb, var(--color-secondary) 7%, #ffffff);
+    --surface-muted: #eef3f9;
     --surface-muted: color-mix(in srgb, var(--color-secondary) 12%, #ffffff);
+    --border: #e3e7f0;
     --border: color-mix(in srgb, var(--color-primary) 12%, #e7eaf3);
     --ink: #1d2433;
+    --muted: #6b7280;
     --muted: color-mix(in srgb, var(--color-primary) 35%, #71788a);
 
     --sidebar-bg: var(--color-primary);
+    --sidebar-grad: #081637;
     --sidebar-grad: color-mix(in srgb, var(--color-primary) 80%, #000);
     --sidebar-text: rgba(255, 255, 255, .78);
     --sidebar-text-strong: #fff;
@@ -55,27 +74,42 @@
     --shadow-lg: 0 18px 48px rgba(16, 24, 40, .18);
 }
 
-/* ---- Semantic tokens: DARK (palette-tinted) ---- */
+/* ---- Semantic tokens: DARK ----
+   Backgrounds are near-black shades of the PRIMARY colour (primary mixed toward
+   #000) — never flat grey/black — so dark mode keeps the palette's hue and
+   re-tints when the palette changes. Fallbacks assume the default navy palette. */
 [data-bs-theme="dark"] {
-    --brand: color-mix(in srgb, var(--color-secondary) 70%, var(--color-primary));
+    --brand: #6EC1FF;
+    --brand: color-mix(in srgb, var(--color-secondary) 72%, var(--color-primary));
+    --brand-hover: #a9dbff;
     --brand-hover: color-mix(in srgb, var(--color-secondary) 85%, #fff);
+    --brand-soft: rgba(110, 193, 255, .16);
     --brand-soft: color-mix(in srgb, var(--color-secondary) 16%, transparent);
     --on-brand: #06121f;
     --accent: var(--color-accent);
 
-    --app-bg: color-mix(in srgb, var(--color-primary) 16%, #0b0e14);
-    --surface: color-mix(in srgb, var(--color-primary) 14%, #11151c);
-    --surface-2: color-mix(in srgb, var(--color-primary) 22%, #11151c);
-    --surface-muted: color-mix(in srgb, var(--color-primary) 30%, #11151c);
-    --border: color-mix(in srgb, var(--color-secondary) 14%, #2b313d);
-    --ink: #e8edf6;
-    --muted: color-mix(in srgb, var(--color-secondary) 24%, #97a0b3);
+    --app-bg: #04080f;
+    --app-bg: color-mix(in srgb, var(--color-primary) 14%, #000);
+    --surface: #081026;
+    --surface: color-mix(in srgb, var(--color-primary) 22%, #000);
+    --surface-2: #0a1530;
+    --surface-2: color-mix(in srgb, var(--color-primary) 30%, #000);
+    --surface-muted: #0d1a3b;
+    --surface-muted: color-mix(in srgb, var(--color-primary) 38%, #000);
+    --border: #11214c;
+    --border: color-mix(in srgb, var(--color-primary) 46%, #000);
+    --ink: #eef2f9;
+    --muted: #9aa6c4;
+    --muted: color-mix(in srgb, var(--color-secondary) 30%, #8b94ac);
 
-    --sidebar-bg: color-mix(in srgb, var(--color-primary) 42%, #070a0f);
-    --sidebar-grad: color-mix(in srgb, var(--color-primary) 30%, #05070b);
+    --sidebar-bg: #091331;
+    --sidebar-bg: color-mix(in srgb, var(--color-primary) 26%, #000);
+    --sidebar-grad: #050a1c;
+    --sidebar-grad: color-mix(in srgb, var(--color-primary) 12%, #000);
     --sidebar-text: rgba(255, 255, 255, .72);
     --sidebar-text-strong: #fff;
-    --sidebar-active-bg: color-mix(in srgb, var(--color-secondary) 30%, transparent);
+    --sidebar-active-bg: rgba(110, 193, 255, .26);
+    --sidebar-active-bg: color-mix(in srgb, var(--color-secondary) 26%, transparent);
     --sidebar-active-ink: #fff;
     --sidebar-hover-bg: rgba(255, 255, 255, .07);
 

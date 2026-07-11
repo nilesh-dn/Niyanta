@@ -1,0 +1,6 @@
+{
+    "name": "Salary & Performance Management",
+    "version": "1.0",
+    "author": "Niyanta Team",
+    "description": "Manage salaries, attendance hours and performance. Includes an Apploye time-tracking integration layer, salary-slip PDF generation/email, and performance grading."
+}

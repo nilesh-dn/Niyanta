@@ -13,6 +13,7 @@
 /uploads/logos/*
 /uploads/plugins/*
 /uploads/files/*
+/uploads/employees/
 !/uploads/logos/.gitkeep
 !/uploads/plugins/.gitkeep
 !/uploads/files/.gitkeep
